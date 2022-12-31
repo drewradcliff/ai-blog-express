@@ -18,6 +18,7 @@ app.get("/post", async (req, res) => {
   if (authorization !== `Bearer ${process.env.NEXT_API_KEY}`) {
     return res.status(401).json({ message: "Invalid token" });
   }
+
   try {
     const { data } = await twitterClient.tweets.usersIdTweets("44196397", {
       exclude: ["replies", "retweets"],
@@ -55,6 +56,37 @@ app.get("/post", async (req, res) => {
     }
   } catch (err) {
     return res.status(500).send("Error generating post");
+  }
+});
+
+app.get("/post/:id", async (req, res) => {
+  const { authorization } = req.headers;
+  if (authorization !== `Bearer ${process.env.NEXT_API_KEY}`) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+  const { id } = req.params;
+  try {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    res.status(200).json(post);
+  } catch (err) {
+    res.status(500).json({ err, message: "Error getting post" });
+  }
+});
+
+app.get("/posts", async (req, res) => {
+  const { authorization } = req.headers;
+  if (authorization !== `Bearer ${process.env.NEXT_API_KEY}`) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+  try {
+    const posts = await prisma.post.findMany();
+    res.status(200).json(posts);
+  } catch (err) {
+    return res.status(500).send("Error getting posts");
   }
 });
 

@@ -9,5 +9,5 @@ jobs:
       - name: Call our API route
         run: |
           curl \
-          --url 'https://ai-blog-api-production.up.railway.app post' \
+          --url 'https://ai-blog-api-production.up.railway.app/post' \
           --header 'Authorization: Bearer ${{ secrets.NEXT_API_KEY }}'
