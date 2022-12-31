@@ -22,3 +22,5 @@ yarn-error.log*
 
 # out dir
 dist/
+
+.env

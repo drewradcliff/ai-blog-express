@@ -1,26 +1,32 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@prisma/client': ^4.8.0
+  '@types/body-parser': ^1.19.2
   '@types/express': ^4.17.12
   '@types/node': ^15.12.2
   express: ^4.17.1
   moment: ^2.29.4
   nodemon: ^2.0.7
   openai: ^3.1.0
+  prisma: ^4.8.0
   ts-node: ^10.0.0
   twitter-api-sdk: ^1.2.1
   typescript: ^4.3.2
 
 dependencies:
+  '@prisma/client': 4.8.0_prisma@4.8.0
   express: 4.18.2
   moment: 2.29.4
   openai: 3.1.0
   twitter-api-sdk: 1.2.1
 
 devDependencies:
+  '@types/body-parser': 1.19.2
   '@types/express': 4.17.15
   '@types/node': 15.14.9
   nodemon: 2.0.20
+  prisma: 4.8.0
   ts-node: 10.9.1_nzafxra4mdyuer2ejmql6rdadq
   typescript: 4.9.4
 
@@ -48,6 +54,28 @@ packages:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
+
+  /@prisma/client/4.8.0_prisma@4.8.0:
+    resolution: {integrity: sha512-Y1riB0p2W52kh3zgssP/YAhln3RjBFcJy3uwEiyjmU+TQYh6QTZDRFBo3JtBWuq2FyMOl1Rye8jxzUP+n0l5Cg==}
+    engines: {node: '>=14.17'}
+    requiresBuild: true
+    peerDependencies:
+      prisma: '*'
+    peerDependenciesMeta:
+      prisma:
+        optional: true
+    dependencies:
+      '@prisma/engines-version': 4.8.0-61.d6e67a83f971b175a593ccc12e15c4a757f93ffe
+      prisma: 4.8.0
+    dev: false
+
+  /@prisma/engines-version/4.8.0-61.d6e67a83f971b175a593ccc12e15c4a757f93ffe:
+    resolution: {integrity: sha512-MHSOSexomRMom8QN4t7bu87wPPD+pa+hW9+71JnVcF3DqyyO/ycCLhRL1we3EojRpZxKvuyGho2REQsMCvxcJw==}
+    dev: false
+
+  /@prisma/engines/4.8.0:
+    resolution: {integrity: sha512-A1Asn2rxZMlLAj1HTyfaCv0VQrLUv034jVay05QlqZg1qiHPeA3/pGTfNMijbsMYCsGVxfWEJuaZZuNxXGMCrA==}
+    requiresBuild: true
 
   /@tsconfig/node10/1.0.9:
     resolution: {integrity: sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA==}
@@ -669,6 +697,14 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
     dev: true
+
+  /prisma/4.8.0:
+    resolution: {integrity: sha512-DWIhxvxt8f4h6MDd35mz7BJff+fu7HItW3WPDIEpCR3RzcOWyiHBbLQW5/DOgmf+pRLTjwXQob7kuTZVYUAw5w==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    requiresBuild: true
+    dependencies:
+      '@prisma/engines': 4.8.0
 
   /proxy-addr/2.0.7:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}

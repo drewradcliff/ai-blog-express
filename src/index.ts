@@ -1,5 +1,6 @@
 import express from "express";
 import moment from "moment";
+import { PrismaClient } from "@prisma/client";
 import { openai } from "./lib/openai";
 import { twitterClient } from "./lib/twitter";
 
@@ -9,6 +10,8 @@ const port = process.env.PORT || 3333;
 app.use(express.json());
 app.use(express.raw({ type: "application/vnd.custom-type" }));
 app.use(express.text({ type: "text/html" }));
+
+const prisma = new PrismaClient();
 
 app.get("/post", async (req, res) => {
   const { authorization } = req.headers;
@@ -35,6 +38,13 @@ app.get("/post", async (req, res) => {
         prompt: `Write a blog post in html about '${topTweet?.text}' as if it was written by Elon Musk`,
         max_tokens: 2000,
         temperature: 0,
+      });
+      await prisma.post.create({
+        data: {
+          title: topTweet.text,
+          content: openAiData.choices[0].text ?? "",
+          tweetUrl: "https://twitter.com/elonmusk/status/" + topTweet.id,
+        },
       });
       res.status(200).json({
         tweet: topTweet,
