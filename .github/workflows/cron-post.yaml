@@ -1,4 +1,4 @@
-name: daily-cron
+name: cron-post
 on:
   schedule:
     - cron: "0 1 * * *"
