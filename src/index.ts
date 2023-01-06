@@ -3,6 +3,8 @@ import moment from "moment";
 import { PrismaClient } from "@prisma/client";
 import { openai } from "./lib/openai";
 import { twitterClient } from "./lib/twitter";
+import fs from "fs";
+import https from "https";
 
 const app = express();
 const port = process.env.PORT || 3333;
@@ -10,14 +12,15 @@ const port = process.env.PORT || 3333;
 app.use(express.json());
 app.use(express.raw({ type: "application/vnd.custom-type" }));
 app.use(express.text({ type: "text/html" }));
+app.use(express.static("./public"));
 
 const prisma = new PrismaClient();
 
 app.get("/post", async (req, res) => {
-  const { authorization } = req.headers;
-  if (authorization !== `Bearer ${process.env.NEXT_API_KEY}`) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
+  // const { authorization } = req.headers;
+  // if (authorization !== `Bearer ${process.env.NEXT_API_KEY}`) {
+  //   return res.status(401).json({ message: "Invalid token" });
+  // }
 
   try {
     const { data } = await twitterClient.tweets.usersIdTweets("44196397", {
@@ -34,28 +37,48 @@ app.get("/post", async (req, res) => {
           : curr
       );
 
-      const { data: openAiData } = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: `Write a blog post in html about '${topTweet?.text}' as if it was written by Elon Musk`,
-        max_tokens: 2000,
-        temperature: 0,
+      // const { data: openAiData } = await openai.createCompletion({
+      //   model: "text-davinci-003",
+      //   prompt: `Write a blog post in html about '${topTweet?.text}' as if it was written by Elon Musk`,
+      //   max_tokens: 2000,
+      //   temperature: 0,
+      // });
+
+      const response = await openai.createImage({
+        prompt: topTweet?.text,
+        n: 1,
+        size: "512x512",
       });
-      await prisma.post.create({
-        data: {
-          title: topTweet.text,
-          content: openAiData.choices[0].text ?? "",
-          tweetUrl: "https://twitter.com/elonmusk/status/" + topTweet.id,
-        },
-      });
+      const imageUrl = response.data.data[0].url;
+      console.log(imageUrl);
+      if (imageUrl) {
+        const fileName = `${Date.now()}.png`;
+        const file = fs.createWriteStream("./public/" + fileName);
+        const request = https.get(imageUrl, function (response) {
+          response.pipe(file);
+          file.on("finish", () => {
+            file.close();
+            console.log("Download Completed");
+          });
+        });
+      }
+
+      // await prisma.post.create({
+      //   data: {
+      //     title: topTweet.text,
+      //     content: openAiData.choices[0].text ?? "",
+      //     tweetUrl: "https://twitter.com/elonmusk/status/" + topTweet.id,
+      //   },
+      // });
       res.status(200).json({
         tweet: topTweet,
-        data: openAiData,
+        image: imageUrl,
       });
     } else {
       return res.status(500).json("No tweets available today");
     }
   } catch (err) {
-    return res.status(500).send("Error generating post");
+    return res.status(500).send({ err, message: "Error generating post" });
   }
 });
 
