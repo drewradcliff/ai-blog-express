@@ -13,4 +13,12 @@ model Post {
   title     String
   content   String
   createdAt DateTime @default(now())
+  Image     Image?
+}
+
+model Image {
+  id       Int    @id @default(autoincrement())
+  fileName String
+  Post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   Int    @unique
 }

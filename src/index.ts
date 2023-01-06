@@ -17,10 +17,10 @@ app.use(express.static("./public"));
 const prisma = new PrismaClient();
 
 app.get("/post", async (req, res) => {
-  // const { authorization } = req.headers;
-  // if (authorization !== `Bearer ${process.env.NEXT_API_KEY}`) {
-  //   return res.status(401).json({ message: "Invalid token" });
-  // }
+  const { authorization } = req.headers;
+  if (authorization !== `Bearer ${process.env.NEXT_API_KEY}`) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
 
   try {
     const { data } = await twitterClient.tweets.usersIdTweets("44196397", {
@@ -37,22 +37,30 @@ app.get("/post", async (req, res) => {
           : curr
       );
 
-      // const { data: openAiData } = await openai.createCompletion({
-      //   model: "text-davinci-003",
-      //   prompt: `Write a blog post in html about '${topTweet?.text}' as if it was written by Elon Musk`,
-      //   max_tokens: 2000,
-      //   temperature: 0,
-      // });
+      const { data: openAiData } = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `Write a blog post in html about '${topTweet?.text}' as if it was written by Elon Musk`,
+        max_tokens: 2000,
+        temperature: 0,
+      });
 
-      const response = await openai.createImage({
+      const post = await prisma.post.create({
+        data: {
+          title: topTweet.text,
+          content: openAiData.choices[0].text ?? "",
+          tweetUrl: "https://twitter.com/elonmusk/status/" + topTweet.id,
+        },
+      });
+
+      const { data: imageData } = await openai.createImage({
         prompt: topTweet?.text,
         n: 1,
         size: "512x512",
       });
-      const imageUrl = response.data.data[0].url;
-      console.log(imageUrl);
+      const imageUrl = imageData.data[0].url;
       if (imageUrl) {
-        const fileName = `${Date.now()}.png`;
+        const imageName = Date.now();
+        const fileName = `${imageName}.png`;
         const file = fs.createWriteStream("./public/" + fileName);
         const request = https.get(imageUrl, function (response) {
           response.pipe(file);
@@ -61,15 +69,15 @@ app.get("/post", async (req, res) => {
             console.log("Download Completed");
           });
         });
+
+        await prisma.image.create({
+          data: {
+            fileName,
+            postId: post.id,
+          },
+        });
       }
 
-      // await prisma.post.create({
-      //   data: {
-      //     title: topTweet.text,
-      //     content: openAiData.choices[0].text ?? "",
-      //     tweetUrl: "https://twitter.com/elonmusk/status/" + topTweet.id,
-      //   },
-      // });
       res.status(200).json({
         tweet: topTweet,
         image: imageUrl,
@@ -92,6 +100,9 @@ app.get("/post/:id", async (req, res) => {
     const post = await prisma.post.findUnique({
       where: {
         id: Number(id),
+      },
+      include: {
+        Image: true,
       },
     });
     res.status(200).json(post);
