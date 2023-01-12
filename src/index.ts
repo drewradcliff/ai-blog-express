@@ -40,10 +40,20 @@ app.get("/post", async (req, res) => {
         max_tokens: 2000,
         temperature: 0,
       });
+
+      let title = "";
+      const content = openAiData.choices[0].text?.replaceAll(
+        /<h1>(.*?)<\/h1>/gm,
+        (_, match) => {
+          title = match;
+          return "";
+        }
+      );
+
       await prisma.post.create({
         data: {
-          title: topTweet.text,
-          content: openAiData.choices[0].text ?? "",
+          title,
+          content: content ?? "",
           tweetUrl: "https://twitter.com/elonmusk/status/" + topTweet.id,
         },
       });
