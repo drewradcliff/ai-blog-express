@@ -93,7 +93,9 @@ app.get("/posts", async (req, res) => {
     return res.status(401).json({ message: "Invalid token" });
   }
   try {
-    const posts = await prisma.post.findMany({ orderBy: { createdAt: "asc" } });
+    const posts = await prisma.post.findMany({
+      orderBy: { createdAt: "desc" },
+    });
     res.status(200).json(posts);
   } catch (err) {
     return res.status(500).send("Error getting posts");
