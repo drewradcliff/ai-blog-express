@@ -22,7 +22,7 @@ app.get("/post", async (req, res) => {
   try {
     const { data } = await twitterClient.tweets.usersIdTweets("44196397", {
       exclude: ["replies", "retweets"],
-      start_time: moment().subtract(1, "day").format(),
+      start_time: moment().subtract(1, "week").format(),
       max_results: 100,
       "tweet.fields": ["public_metrics"],
     });
